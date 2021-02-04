@@ -1,0 +1,30 @@
+{
+  "name": "csc-ca2",
+  "version": "1.0.0",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "Ian Hong",
+  "license": "ISC",
+  "devDependencies": {
+    "nodemon": "^2.0.4"
+  },
+  "dependencies": {
+    "aws-sdk": "^2.834.0",
+    "bcrypt": "^5.0.0",
+    "clarifai-nodejs-grpc": "^7.0.3",
+    "connect-flash": "^0.1.1",
+    "dotenv": "^8.2.0",
+    "ejs": "^3.1.5",
+    "express": "^4.17.1",
+    "express-ejs-layouts": "^2.5.0",
+    "express-session": "^1.17.1",
+    "install": "^0.13.0",
+    "mongoose": "^5.11.14",
+    "npm": "^7.5.2",
+    "passport": "^0.4.1",
+    "passport-local": "^1.0.0"
+  }
+}
