@@ -1,22 +1,10 @@
 <html>
 <h1>Dashboard</h1>
 <%- include ('./partials/messages') %>
-    <p> Welcome</p>
+    <p> Welcome, Thanks for Login, now you can upload your talent</p>
     <p class="test1" style="display:none">holy shit</p>
-    <button id="abc" type="submit">TEST</button>
+    <button id="subscription" type="submit">Subscribed?</button>
 
-    <form action="users/charge" method="post" id="stripeform">
-
-        <article>
-            <label>Subscription: $0.5</label>
-        </article>
-
-        <script class="stripe-button" src="//checkout.stripe.com/v3/checkout.js" data-locale="auto"
-            data-description="Sample Charge" data-amount="50" data-key="pk_test_pkm5H92ftr1Ca2Dj1OoUjS5N007xrIX3LY"
-            data-name="Subscription">
-
-            </script>
-    </form>
     <p class="test"></p>
 
     <input type="file" name="file" id="file" value="dataFile" required="" accept="image/*">
@@ -34,20 +22,7 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js" type="text/javascript"></script>
     <script>
 
-        $("#stripeform").submit(function (event) {
-            event.preventDefault(); //prevent default action 
-            var post_url = $(this).attr("action"); //get form action url
-            var request_method = $(this).attr("method"); //get form GET/POST method
-            var form_data = $(this).serialize(); //Encode form elements for submission
-            $.ajax({
-                url: post_url,
-                type: request_method,
-                data: form_data
-            }).done(function (response) { //
-            });
-        });
-
-        $("#abc").click(function (event) {
+        $("#subscription").click(function (event) {
             event.preventDefault(); //prevent default action
             $.ajax({
                 url: "users/get",
@@ -58,7 +33,7 @@
             });
         });
 
-        function uploadFile() {
+        async function uploadFile() {
             const app = new Clarifai.App({
                 apiKey: 'c93903e8e94c4084865ae2d08dd94690'
             });
@@ -69,18 +44,17 @@
             if (!fileChooser.length) {
                 return alert("Please choose a file");
             }
-            
-            const reader = new FileReader();
-            const baseImage = reader.readAsDataURL(fileChooser[0]);
-            console.log(fileChooser);
-            console.log(baseImage);
+
+            var promiseFile = getBase64(fileChooser[0]);
+            var baseImage = await promiseFile;
+            baseImage = baseImage.replace("data:image/jpeg;base64,", "");
 
             //Create Inputs (clarifai)
             app.inputs.create({
                 base64: baseImage
             }).then(
                 function () {
-                    app.models.predict({ id: 'human-recognition', version: "0d79835fd20a4eedbaea342dcde55696" }, { base64: baseImage }).then(
+                    app.models.predict({ id: 'human-recognition', version: "b208ae9a93d4451991d41fa1d79e1254" }, { base64: baseImage }).then(
                         function (response) {
                             var concepts = response['outputs'][0]['data']['concepts']
                             //console.dir(concepts[0].value.toFixed(20));
@@ -102,7 +76,9 @@
                         }
                     )
                 }
-            )
+            ).catch( function(response){
+                alert(response);
+            })
 
             var albumBucketName = "csctask5-1";
             var bucketRegion = "us-east-1";
@@ -110,9 +86,9 @@
 
             AWS.config.update({
                 region: bucketRegion,
-                accessKeyId: "ASIAXURB2YHHMUNNAPPM",
-                secretAccessKey: "A7Kjeoc+MBzr/zRTiaUi7tUi0d6yqwULCbu3uPIr",
-                sessionToken: "FwoGZXIvYXdzEDIaDAuau91OMg4JiByAHyLKAaeeIHWh1sj8fZ9pcVowokekHP8xav5WcBSi1roPUUQRD6AfrU0sTyzBD9hlAzPQWiKXSTExai9JzluTm7cfUIlKau77FjY0jIpPUzJTddRp2uO5YNQiliS8tp5HXwn/AZqx8rahXjThj7yvitXGGwOvRxnBvhqqzHcTuFnsiTpc157WUSM5lf324QoxmpoQVBhvVKYqMdkplzuR72zfrx5MqOt/gmbIbUmMCKVr0WgBMfbz7vt2q/DTwQiDbyGmtWrSqN0RRLRJnjcoh73wgAYyLfBk1mQCr2MJEMjGCf/OPZYmeMoTwbDEaHKSJVcshdBQ0nH+7SRvOtMVp4VHpQ=="
+                accessKeyId: "ASIAXURB2YHHFBWH7KVN",
+                secretAccessKey: "cTC7FBS69TKBGew0YUk0ZfmIQadvhBzRI5Akah9o",
+                sessionToken: "FwoGZXIvYXdzEEAaDHskrjLPTZhd9Q+uKyLKAf3YwcEe8/SwjX4YkZXjz834X62FjzwdSWECo7QXeSa+AE1uYyFxWTO4wowaAxmoNHXMoFihzQz7cJIgeiPG+Pk4/4Ebi/Ih7ZTvXFDhk1MXOt8zF/kAi2z+ssYmMe0bfoUh96PsPrzaX+hkmhFghHJVohWf8fK6VCDzadNiaXIR18MeuNzWnxmRB8kt3+Nc6oie3yuFY/wuItQnyujp38UxILwFBQdiDrY/JVyRvBcA/A4MlExc8zqzXYmEXHNLfDfLiCq8JwW0eFEo2MbzgAYyLX9ITD+/yTL/2EpYqh18MdOwcK2yyPdvIFW3/fkh6zzeD2XCrnCgTWZa0TUZTQ=="
             });
 
             var uploadS3 = new AWS.S3({
@@ -137,12 +113,12 @@
             return false;
         }
 
-        function getBase64(file) {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
+        function getBase64(file, onLoadCallback) {
+            return new Promise(function(resolve, reject) {
+                var reader = new FileReader();
+                reader.onload = function() { resolve(reader.result); };
+                reader.onerror = reject;
                 reader.readAsDataURL(file);
-                reader.onload = () => resolve(reader.result);
-                reader.onerror = error => reject(error);
             });
         }
     </script>

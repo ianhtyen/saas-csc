@@ -1,5 +1,20 @@
+<html>
 <h1>Register</h1>
 <b><%- include ('./partials/messages') %></b>
+
+<form action="users/charge" method="post" id="stripeform">
+
+  <article>
+      <label>Optional Subscription: $0.5</label>
+  </article>
+
+  <script class="stripe-button" src="//checkout.stripe.com/v3/checkout.js" data-locale="auto"
+      data-description="CSC Human Subscription" data-amount="50" data-key="pk_test_pkm5H92ftr1Ca2Dj1OoUjS5N007xrIX3LY"
+      data-name="Subscription Payment">
+
+      </script>
+</form>
+
 <form action="/users/register" method="POST">
 <div>
     <label for="email">Email</label>
@@ -32,4 +47,26 @@
     Register
   </button>
 </form>
-<p >Have An Account? <a href="/users/login">Login</a></p>
+
+<p >Have An Account? <a href="/users/login">Login</a></p></br>
+<a href="/">Back to Main Page</a>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js" type="text/javascript"></script>
+<script>
+
+          $("#stripeform").submit(function (event) {
+            event.preventDefault(); //prevent default action 
+            var post_url = $(this).attr("action"); //get form action url
+            var request_method = $(this).attr("method"); //get form GET/POST method
+            var form_data = $(this).serialize(); //Encode form elements for submission
+            $.ajax({
+                url: post_url,
+                type: request_method,
+                data: form_data
+            }).done(function (response) {
+              console.log(response);
+            });
+          });
+
+</script>
+</html>

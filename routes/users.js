@@ -14,7 +14,6 @@ dotenv.config();
 const keySecret = process.env.stripe_sKey;
 const stripe = require("stripe")(keySecret);
 
-
 //welcome handle
 router.get('/login',(req,res)=>{
     res.render('login');
@@ -59,11 +58,11 @@ router.post("/charge", (req, res) => {
             if (err) { //DB Problem
                 console.log(err);
                 errors.push({msg: "Unable to save to db, JSON:" + err})
-                res.redirect('/dashboard');
+                res.redirect('/register');
             } else { //Successful
                 console.log(data);
-                req.flash('success_msg','Successfully Registered!');
-                res.redirect('/dashboard');
+                req.flash('success_msg','Successfully Subscribed!');
+                res.redirect('/register');
             }
         });
     });
@@ -73,7 +72,6 @@ router.post("/charge", (req, res) => {
 router.get('/get',(req,res)=>{
     res.status(200).send("ABC");
 });
-
 
 //register post handle
 router.post('/register',(req,res)=>{
