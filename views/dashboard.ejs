@@ -1,4 +1,150 @@
+<html>
 <h1>Dashboard</h1>
-<p> Welcome <%= user.email %></p>
-<p style="display:none">holy shit</p>
-<a href="/users/logout">Logout</a>
+<%- include ('./partials/messages') %>
+    <p> Welcome</p>
+    <p class="test1" style="display:none">holy shit</p>
+    <button id="abc" type="submit">TEST</button>
+
+    <form action="users/charge" method="post" id="stripeform">
+
+        <article>
+            <label>Subscription: $0.5</label>
+        </article>
+
+        <script class="stripe-button" src="//checkout.stripe.com/v3/checkout.js" data-locale="auto"
+            data-description="Sample Charge" data-amount="50" data-key="pk_test_pkm5H92ftr1Ca2Dj1OoUjS5N007xrIX3LY"
+            data-name="Subscription">
+
+            </script>
+    </form>
+    <p class="test"></p>
+
+    <input type="file" name="file" id="file" value="dataFile" required="" accept="image/*">
+    <button onclick="uploadFile()">Upload to S3</button><br>
+    <hr />
+    <div id='loadingmessage' style='display:none'>
+        <img src='https://static.impression.co.uk/2014/05/loading1.gif' height=200 />
+    </div>
+    <hr />
+    <a href="/users/logout">Logout</a>
+
+    <script src="https://sdk.amazonaws.com/js/aws-sdk-2.1.24.min.js"></script>
+    <script type="text/javascript"
+        src="https://sdk.clarifai.com/js/clarifai-latest.js">const Clarifai = require('clarifai');</script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js" type="text/javascript"></script>
+    <script>
+
+        $("#stripeform").submit(function (event) {
+            event.preventDefault(); //prevent default action 
+            var post_url = $(this).attr("action"); //get form action url
+            var request_method = $(this).attr("method"); //get form GET/POST method
+            var form_data = $(this).serialize(); //Encode form elements for submission
+            $.ajax({
+                url: post_url,
+                type: request_method,
+                data: form_data
+            }).done(function (response) { //
+            });
+        });
+
+        $("#abc").click(function (event) {
+            event.preventDefault(); //prevent default action
+            $.ajax({
+                url: "users/get",
+                type: "GET",
+            }).done(function (response) {
+                $(".test").append(response);
+                $(".test1").show();
+            });
+        });
+
+        function uploadFile() {
+            const app = new Clarifai.App({
+                apiKey: 'c93903e8e94c4084865ae2d08dd94690'
+            });
+            const loading = document.getElementById("loadingmessage");
+            loading.style.display = "block";
+
+            var fileChooser = document.getElementById('file').files;
+            if (!fileChooser.length) {
+                return alert("Please choose a file");
+            }
+            
+            const reader = new FileReader();
+            const baseImage = reader.readAsDataURL(fileChooser[0]);
+            console.log(fileChooser);
+            console.log(baseImage);
+
+            //Create Inputs (clarifai)
+            app.inputs.create({
+                base64: baseImage
+            }).then(
+                function () {
+                    app.models.predict({ id: 'human-recognition', version: "0d79835fd20a4eedbaea342dcde55696" }, { base64: baseImage }).then(
+                        function (response) {
+                            var concepts = response['outputs'][0]['data']['concepts']
+                            //console.dir(concepts[0].value.toFixed(20));
+                            var score = concepts[0].value.toFixed(20)
+                            if (score > 0.5) {
+                                alert("Result:" + score);
+                                loading.style.display = "none";
+                            } else {
+                                console.log(response)
+                                alert(score);
+                                receiptVerify.innerHTML = displayResult + score;
+                                loading.style.display = "none";
+                            }
+                        },
+                        function (err) {
+                            alert(score);
+                            console.dir(err);
+                            loading.style.display = "none";
+                        }
+                    )
+                }
+            )
+
+            var albumBucketName = "csctask5-1";
+            var bucketRegion = "us-east-1";
+            console.log(bucketRegion);
+
+            AWS.config.update({
+                region: bucketRegion,
+                accessKeyId: "ASIAXURB2YHHMUNNAPPM",
+                secretAccessKey: "A7Kjeoc+MBzr/zRTiaUi7tUi0d6yqwULCbu3uPIr",
+                sessionToken: "FwoGZXIvYXdzEDIaDAuau91OMg4JiByAHyLKAaeeIHWh1sj8fZ9pcVowokekHP8xav5WcBSi1roPUUQRD6AfrU0sTyzBD9hlAzPQWiKXSTExai9JzluTm7cfUIlKau77FjY0jIpPUzJTddRp2uO5YNQiliS8tp5HXwn/AZqx8rahXjThj7yvitXGGwOvRxnBvhqqzHcTuFnsiTpc157WUSM5lf324QoxmpoQVBhvVKYqMdkplzuR72zfrx5MqOt/gmbIbUmMCKVr0WgBMfbz7vt2q/DTwQiDbyGmtWrSqN0RRLRJnjcoh73wgAYyLfBk1mQCr2MJEMjGCf/OPZYmeMoTwbDEaHKSJVcshdBQ0nH+7SRvOtMVp4VHpQ=="
+            });
+
+            var uploadS3 = new AWS.S3({
+                params: { Bucket: albumBucketName }
+            });
+
+            var file = fileChooser[0];
+            var fileName = file.name;
+            if (file) {
+                var params2 = { Key: fileName, ContentType: file.type, Body: file };
+                uploadS3.upload(params2).on('httpUploadProgress', function (evt) {
+                    console.log("Uploaded :: " + parseInt((evt.loaded * 100) / evt.total) + '%');
+                }).send(function (err, data) {
+                    if (err) {
+                        alert("File uploaded Error." + err.message);
+                        console.log(err, err.stack);
+                    }
+                    else
+                        alert("File uploaded successfully."); //"https://csctask5-1.s3.amazonaws.com/myAvatar.png;
+                });
+            }
+            return false;
+        }
+
+        function getBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = error => reject(error);
+            });
+        }
+    </script>
+
+</html>

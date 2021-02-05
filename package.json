@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node app.js"
   },
   "keywords": [],
   "author": "Ian Hong",
@@ -25,6 +26,8 @@
     "mongoose": "^5.11.14",
     "npm": "^7.5.2",
     "passport": "^0.4.1",
-    "passport-local": "^1.0.0"
-  }
+    "passport-local": "^1.0.0",
+    "stripe": "^8.133.0"
+  },
+  "description": "Using node.js"
 }

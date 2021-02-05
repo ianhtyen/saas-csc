@@ -23,7 +23,7 @@ module.exports = function(passport){
                     if (err) {
                         console.log(err);
                         console.log(email);
-                        return done(null,false,{message:'Email is not registered'});
+                        return done(null,false,{message:'Email is not registered or Token Expired'});
                     } else {
                         bcrypt.compare(password,data.Item.password,(err,isMatch)=>{
                             if(err) throw Error;
@@ -40,8 +40,8 @@ module.exports = function(passport){
             }
         })
     )
-    passport.serializeUser(function(user,done) {
-        done(null,user.email);
+    passport.serializeUser(function(data,done) {
+        done(null,data.email);
     })
     passport.deserializeUser(function(email,done){
         const paramsDes = {

@@ -10,6 +10,10 @@ var docClient = new AWS.DynamoDB.DocumentClient();
 const dotenv = require('dotenv');
 dotenv.config();
 
+//stripe config:
+const keySecret = process.env.stripe_sKey;
+const stripe = require("stripe")(keySecret);
+
 
 //welcome handle
 router.get('/login',(req,res)=>{
@@ -28,9 +32,52 @@ passport.authenticate('local',{
 })(req,res,next)
 });
 
+//stripe handle
+router.post("/charge", (req, res) => {
+    let amount = 50;
+  
+    stripe.customers.create({
+       email: req.body.stripeEmail,
+      source: req.body.stripeToken
+    })
+    .then(customer =>
+      stripe.charges.create({
+        amount,
+        description: "Sample Charge",
+           currency: "usd",
+           customer: customer.id
+      }))
+    .then((charge) => {
+        var input = {
+            "email": req.body.stripeEmail,
+        };
+        var paramsWrite = {
+            TableName: "stripe",
+            Item:  input
+        };
+        docClient.put(paramsWrite, function(err, data) {
+            if (err) { //DB Problem
+                console.log(err);
+                errors.push({msg: "Unable to save to db, JSON:" + err})
+                res.redirect('/dashboard');
+            } else { //Successful
+                console.log(data);
+                req.flash('success_msg','Successfully Registered!');
+                res.redirect('/dashboard');
+            }
+        });
+    });
+});
+
+//test handle
+router.get('/get',(req,res)=>{
+    res.status(200).send("ABC");
+});
+
+
 //register post handle
 router.post('/register',(req,res)=>{
-    const {name,email, password, password2} = req.body;
+    const {email, password, password2} = req.body;
     let errors = [];
     console.log(' email :' + email+ ' pass:' + password);
     if(!email || !password || !password2) {
