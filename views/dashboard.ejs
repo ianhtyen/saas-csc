@@ -1,20 +1,75 @@
 <html>
 <h1>Dashboard</h1>
+<a href="/users/logout">Logout</a>
 <%- include ('./partials/messages') %>
+    <hr />
     <p> Welcome, Thanks for Login, now you can upload your talent</p>
-    <p class="test1" style="display:none">holy shit</p>
-    <button id="subscription" type="submit">Subscribed?</button>
-
+    <button id="resetDb" type="submit">Reset Database</button>
     <p class="test"></p>
+    <hr />
 
+    <h1>Upload</h1>
     <input type="file" name="file" id="file" value="dataFile" required="" accept="image/*">
     <button onclick="uploadFile()">Upload to S3</button><br>
     <hr />
+    <h1>Loading</h1>
     <div id='loadingmessage' style='display:none'>
         <img src='https://static.impression.co.uk/2014/05/loading1.gif' height=200 />
     </div>
     <hr />
-    <a href="/users/logout">Logout</a>
+    <h1>Edit Talents</h1>
+    <h2>Update Talent</h2>
+    <label>ID:</label>
+    <input id="updateId" type="text" required />
+    <label>Name:</label>
+    <input id="updateName" type="text" required />
+    <label>Bio:</label>
+    <input id="updateBio" type="text" required />
+    <button id="update">Update</button>
+    <h2>Delete Talent</h2>
+    <label>ID:</label>
+    <input id="deleteId" type="text" required />
+    <button id="delete">Delete</button>
+    <hr />
+    <h1>Talents Album</h1>
+    <div class="album">
+
+    </div>
+    <hr />
+    <div id="disqus_thread"></div>
+    <script>
+        /**
+         *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT 
+         *  THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR 
+         *  PLATFORM OR CMS.
+         *  
+         *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: 
+         *  https://disqus.com/admin/universalcode/#configuration-variables
+         */
+
+        var disqus_config = function () {
+            // Replace PAGE_URL with your page's canonical URL variable
+            this.page.url = PAGE_URL;
+        };
+
+
+        (function () {  // REQUIRED CONFIGURATION VARIABLE: EDIT THE SHORTNAME BELOW
+            var d = document, s = d.createElement('script');
+
+            // IMPORTANT: Replace EXAMPLE with your forum shortname!
+            s.src = 'https://EXAMPLE.disqus.com/embed.js';
+
+            s.setAttribute('data-timestamp', +new Date());
+            (d.head || d.body).appendChild(s);
+        })();
+    </script>
+    <noscript>
+        Please enable JavaScript to view the
+        <a href="https://disqus.com/?ref_noscript" rel="nofollow">
+            comments powered by Disqus.
+        </a>
+    </noscript>
+
 
     <script src="https://sdk.amazonaws.com/js/aws-sdk-2.1.24.min.js"></script>
     <script type="text/javascript"
@@ -22,101 +77,204 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js" type="text/javascript"></script>
     <script>
 
-        $("#subscription").click(function (event) {
-            event.preventDefault(); //prevent default action
+        //update
+        $('#update').click(function () {
+            var id = $('#updateId').val();
+            var name = $('#updateName').val();
+            var bio = $('#updateBio').val();
+
+            if (id === "" || name === "" || bio === "") {
+                alert('Please fill up the field');
+                return;
+            }
+
+            var updateBody = {
+                name: name,
+                bio: bio,
+            }
+
             $.ajax({
-                url: "users/get",
-                type: "GET",
+                url: `talents/data/${id}`,
+                type: "PUT",
+                data: updateBody,
             }).done(function (response) {
-                $(".test").append(response);
-                $(".test1").show();
+                displayTalents();
+                console.log(response);
+                alert("Affected rows:" + response.affectedRows)
+            }).fail(function(response){
+                console.log(response);
+                alert(response.statusText);
+            })
+            .catch(function (err) {
+                alert(err.responseJSON.sqlMessage);
+                console.log(err);
             });
         });
 
+        //delete
+        $('#delete').click(function () {
+            var id = $('#deleteId').val();
+            console.log(id);
+            if (id === "") {
+                alert('Please fill up the field');
+                return;
+            }
+            $.ajax({
+                url: `talents/data/${id}`,
+                type: "DELETE",
+            }).done(function (response) {
+                displayTalents();
+                console.log(response);
+                alert("Affected rows:" + response.affectedRows)
+            }).fail(function(response){
+                console.log(response);
+                alert(response.statusText);
+            })
+            .catch(function (err) {
+                alert(err.responseJSON.sqlMessage);
+                console.log(err);
+            });
+        });
+
+        //get
+        function displayTalents() {
+            $.ajax({
+                url: "talents/data",
+                type: "GET",
+            }).done(function (response) {
+                var array = response;
+                $(".album").html("");
+                for (i = 0; i < array.length; i++) {
+                    $(".album").append(`<h2>${array[i].name}(ID: ${array[i].id}) [Bio:${array[i].bio}]</h2><img height=250 width=250 src="${array[i].imageLongUrl}">`);
+                }
+                console.log(response);
+            });
+        }
+
+        //on load to display
+        $(window).on('load', function () {
+            displayTalents();
+        });
+
+        //reset db
+        $("#resetDb").click(function (event) {
+            $.ajax({
+                url: "talents/reset",
+                type: "GET",
+            }).done(function (response) {
+                $('.test').append(response);
+                displayTalents();
+                console.log(response);
+            });
+        });
+
+        //upload file and post
         async function uploadFile() {
+            //clarifai
             const app = new Clarifai.App({
                 apiKey: 'c93903e8e94c4084865ae2d08dd94690'
             });
+
             const loading = document.getElementById("loadingmessage");
             loading.style.display = "block";
 
+            //aws
+            var albumBucketName = "csctask5-1";
+            var bucketRegion = "us-east-1";
+            var link = "s3.amazonaws.com";
+
+            //file
             var fileChooser = document.getElementById('file').files;
             if (!fileChooser.length) {
                 return alert("Please choose a file");
             }
 
+            var file = fileChooser[0];
+            var fileName = file.name;
             var promiseFile = getBase64(fileChooser[0]);
             var baseImage = await promiseFile;
             baseImage = baseImage.replace("data:image/jpeg;base64,", "");
+            baseImage = baseImage.replace("data:image/png;base64,", "");
 
-            //Create Inputs (clarifai)
-            app.inputs.create({
-                base64: baseImage
-            }).then(
-                function () {
-                    app.models.predict({ id: 'human-recognition', version: "b208ae9a93d4451991d41fa1d79e1254" }, { base64: baseImage }).then(
-                        function (response) {
-                            var concepts = response['outputs'][0]['data']['concepts']
-                            //console.dir(concepts[0].value.toFixed(20));
-                            var score = concepts[0].value.toFixed(20)
-                            if (score > 0.5) {
-                                alert("Result:" + score);
-                                loading.style.display = "none";
-                            } else {
-                                console.log(response)
-                                alert(score);
-                                receiptVerify.innerHTML = displayResult + score;
-                                loading.style.display = "none";
-                            }
-                        },
-                        function (err) {
-                            alert(score);
-                            console.dir(err);
-                            loading.style.display = "none";
-                        }
-                    )
-                }
-            ).catch( function(response){
-                alert(response);
-            })
-
-            var albumBucketName = "csctask5-1";
-            var bucketRegion = "us-east-1";
-            console.log(bucketRegion);
-
-            AWS.config.update({
+            //aws config update
+            AWS.config.update({ //USE MX's token keys
                 region: bucketRegion,
-                accessKeyId: "ASIAXURB2YHHFBWH7KVN",
-                secretAccessKey: "cTC7FBS69TKBGew0YUk0ZfmIQadvhBzRI5Akah9o",
-                sessionToken: "FwoGZXIvYXdzEEAaDHskrjLPTZhd9Q+uKyLKAf3YwcEe8/SwjX4YkZXjz834X62FjzwdSWECo7QXeSa+AE1uYyFxWTO4wowaAxmoNHXMoFihzQz7cJIgeiPG+Pk4/4Ebi/Ih7ZTvXFDhk1MXOt8zF/kAi2z+ssYmMe0bfoUh96PsPrzaX+hkmhFghHJVohWf8fK6VCDzadNiaXIR18MeuNzWnxmRB8kt3+Nc6oie3yuFY/wuItQnyujp38UxILwFBQdiDrY/JVyRvBcA/A4MlExc8zqzXYmEXHNLfDfLiCq8JwW0eFEo2MbzgAYyLX9ITD+/yTL/2EpYqh18MdOwcK2yyPdvIFW3/fkh6zzeD2XCrnCgTWZa0TUZTQ=="
+                accessKeyId: "ASIAXURB2YHHNOT2TCF7",
+                secretAccessKey: "eJfORnvHJMPmXC9csClJWnjVbjl0EoAZ1dpcuEMd",
+                sessionToken: "FwoGZXIvYXdzEFwaDO49JL33F+7fQwQBIyLKAc67mRqZBnxzBpEanHq7WlPXe5vIAk6C6ljJ1m9gfUqa8+hQccjgg1auI04Fu4gJ701xG862kxrm095JqFSLYTSN4bLT4XP6ZfelHoGLdqfFq9p/WIcK3bqVyjBN8bTJqlyoWpFB+Ksn690h7DXgCaG2vp7RrYYC5c4hXjqJnJlcV32PmOUu+8Ie5o7LhiPJ2UxNDzk1ya4jQigt6g36UVy8rwH9j9wfe7Jng1b2SxiJOgyEouKelJRAfnXf5XiGQOoTZAM0JoixhD4oydP5gAYyLcTDnItVWfaFwd50VlcNK5uYCrqy070aBiPtL77yKJVdGP9HGAjqzX4l7+W6xw=="
             });
 
             var uploadS3 = new AWS.S3({
                 params: { Bucket: albumBucketName }
             });
 
-            var file = fileChooser[0];
-            var fileName = file.name;
-            if (file) {
-                var params2 = { Key: fileName, ContentType: file.type, Body: file };
-                uploadS3.upload(params2).on('httpUploadProgress', function (evt) {
-                    console.log("Uploaded :: " + parseInt((evt.loaded * 100) / evt.total) + '%');
-                }).send(function (err, data) {
-                    if (err) {
-                        alert("File uploaded Error." + err.message);
-                        console.log(err, err.stack);
-                    }
-                    else
-                        alert("File uploaded successfully."); //"https://csctask5-1.s3.amazonaws.com/myAvatar.png;
-                });
-            }
-            return false;
+            //Create Inputs (clarifai)
+            app.inputs.create({
+                base64: baseImage
+            }).then(
+                function () {
+                    app.models.predict({ id: 'human-recognition', version: "159f84aa23ef474b9fc1cdf8ac6f0f1c" }, { base64: baseImage }).then(
+                        function (response) {
+                            var concepts = response['outputs'][0]['data']['concepts']
+                            var score = concepts[0].value.toFixed(20)
+                            if (score > 0.5) {
+                                alert("Result:" + score);
+                                loading.style.display = "none";
+                                //aws bucket
+                                if (file) {
+                                    var params2 = { Key: fileName, ContentType: file.type, Body: file };
+                                    uploadS3.upload(params2).on('httpUploadProgress', function (evt) {
+                                        console.log("Uploaded :: " + parseInt((evt.loaded * 100) / evt.total) + '%');
+                                    }).send(function (err, data) {
+                                        if (err) {
+                                            alert("File uploaded Error." + err.message);
+                                            console.log(err, err.stack);
+                                        }
+                                        else {
+                                            var amazonLink = `https://${albumBucketName}.${link}/${fileName}`;//https://csctask5-1.s3.amazonaws.com/myAvatar.png;
+                                            alert("File uploaded successfully.");
+                                            fileName = fileName.replace(".PNG", "");
+
+                                            var abc = {
+                                                name: fileName.replace(".jpg", ""),
+                                                bio: "Talents",
+                                                imageLongUrl: amazonLink
+                                            }
+
+                                            //store talents in aws db
+                                            $.ajax({
+                                                url: "talents/data",
+                                                type: "POST",
+                                                data: abc,
+                                            }).done(function (response) {
+                                                displayTalents();
+                                                console.log(response);
+                                            });
+                                        }
+                                    });
+                                }
+                            } else {
+                                console.log(response)
+                                alert(`AI score: ${score}, Not highly a perfect human image`);
+                                loading.style.display = "none";
+                            }
+                        },
+                        function (err) {
+                            alert(err);
+                            console.dir(err);
+                            loading.style.display = "none";
+                        }
+                    )
+                }
+            ).catch(function (response) {
+                alert(response);
+            })
         }
 
         function getBase64(file, onLoadCallback) {
-            return new Promise(function(resolve, reject) {
+            return new Promise(function (resolve, reject) {
                 var reader = new FileReader();
-                reader.onload = function() { resolve(reader.result); };
+                reader.onload = function () { resolve(reader.result); };
                 reader.onerror = reject;
                 reader.readAsDataURL(file);
             });
