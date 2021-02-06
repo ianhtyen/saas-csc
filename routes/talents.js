@@ -6,10 +6,10 @@ var mysql = require('mysql');
 //mysql
 function createDbConnection(){
     var connection = mysql.createConnection({
-        //host: "csc-ca2-db-instance.c1hallmmvxny.us-east-1.rds.amazonaws.com",
-        //user: "csc_ca2_user",
-        host: "aa1l6mggzck13gf.c1hallmmvxny.us-east-1.rds.amazonaws.com",
-        user: "cscCa2User",
+        host: "csc-ca2-db-instance.c1hallmmvxny.us-east-1.rds.amazonaws.com",
+        user: "csc_ca2_user",
+        //host: "aa1l6mggzck13gf.c1hallmmvxny.us-east-1.rds.amazonaws.com",
+        //user: "cscCa2User",
         password: "csc-Ca2!",
         port: 3306
     });
@@ -21,7 +21,7 @@ router.get('/reset',(req,res)=>{
     var connection = createDbConnection();
     connection.connect();
 
-    connection.query('DROP DATABASE csc_ca2;');
+    connection.query('DROP DATABASE IF NOT EXISTS csc_ca2;');
 
     connection.query('CREATE DATABASE IF NOT EXISTS csc_ca2;',
     function (error, result, fields) {
