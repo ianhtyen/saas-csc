@@ -259,6 +259,10 @@
                                             }).done(function (response) {
                                                 displayTalents();
                                                 console.log(response);
+                                                alert(response);
+                                            }).fail(function(err){
+                                                console.log(response);
+                                                alert(response.statusText);
                                             });
                                         }
                                     });
