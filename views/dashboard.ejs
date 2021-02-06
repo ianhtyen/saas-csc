@@ -172,7 +172,7 @@
         async function uploadFile() {
             //clarifai
             const app = new Clarifai.App({
-                apiKey: 'c93903e8e94c4084865ae2d08dd94690'
+                apiKey: '-'
             });
 
             const loading = document.getElementById("loadingmessage");
@@ -199,9 +199,9 @@
             //aws config update
             AWS.config.update({ //USE MX's token keys
                 region: bucketRegion,
-                accessKeyId: "ASIAXURB2YHHNOT2TCF7",
-                secretAccessKey: "eJfORnvHJMPmXC9csClJWnjVbjl0EoAZ1dpcuEMd",
-                sessionToken: "FwoGZXIvYXdzEFwaDO49JL33F+7fQwQBIyLKAc67mRqZBnxzBpEanHq7WlPXe5vIAk6C6ljJ1m9gfUqa8+hQccjgg1auI04Fu4gJ701xG862kxrm095JqFSLYTSN4bLT4XP6ZfelHoGLdqfFq9p/WIcK3bqVyjBN8bTJqlyoWpFB+Ksn690h7DXgCaG2vp7RrYYC5c4hXjqJnJlcV32PmOUu+8Ie5o7LhiPJ2UxNDzk1ya4jQigt6g36UVy8rwH9j9wfe7Jng1b2SxiJOgyEouKelJRAfnXf5XiGQOoTZAM0JoixhD4oydP5gAYyLcTDnItVWfaFwd50VlcNK5uYCrqy070aBiPtL77yKJVdGP9HGAjqzX4l7+W6xw=="
+                accessKeyId: "-",
+                secretAccessKey: "-",
+                sessionToken: "-"
             });
 
             var uploadS3 = new AWS.S3({
