@@ -21,7 +21,7 @@
   //get
   function displayTalents() {
     $.ajax({
-      url: "talents/data",
+      url: "https://prlc23r7bg.execute-api.us-east-1.amazonaws.com/csc-ca2/talents",
       type: "GET",
     }).done(function (response) {
       var array = response;

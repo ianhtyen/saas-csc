@@ -89,21 +89,26 @@
             }
 
             var updateBody = {
-                name: name,
-                bio: bio,
+                "name": name,
+                "bio": bio,
             }
+            updateBody = JSON.stringify(updateBody);
 
             $.ajax({
-                url: `talents/data/${id}`,
+                url: `https://prlc23r7bg.execute-api.us-east-1.amazonaws.com/csc-ca2/talents/${id}`,
                 type: "PUT",
                 data: updateBody,
             }).done(function (response) {
                 displayTalents();
                 console.log(response);
-                alert("Affected rows:" + response.affectedRows)
+                if(response.affectedRows !== 0){
+                    alert("Affected rows:" + response.affectedRows);
+                } else {
+                    alert("Affected rows:" + response.affectedRows + "\nNo results found");
+                }
             }).fail(function(response){
                 console.log(response);
-                alert(response.statusText);
+                alert(response);
             })
             .catch(function (err) {
                 alert(err.responseJSON.sqlMessage);
@@ -120,18 +125,22 @@
                 return;
             }
             $.ajax({
-                url: `talents/data/${id}`,
+                url: `https://prlc23r7bg.execute-api.us-east-1.amazonaws.com/csc-ca2/talents/${id}`,
                 type: "DELETE",
             }).done(function (response) {
                 displayTalents();
                 console.log(response);
-                alert("Affected rows:" + response.affectedRows)
+                if(response.affectedRows !== 0){
+                    alert("Affected rows:" + response.affectedRows);
+                } else {
+                    alert("Affected rows:" + response.affectedRows + "\nNo results found");
+                }
             }).fail(function(response){
                 console.log(response);
                 alert(response.statusText);
             })
             .catch(function (err) {
-                alert(err.responseJSON.sqlMessage);
+                alert(err);
                 console.log(err);
             });
         });
@@ -139,7 +148,7 @@
         //get
         function displayTalents() {
             $.ajax({
-                url: "talents/data",
+                url: "https://prlc23r7bg.execute-api.us-east-1.amazonaws.com/csc-ca2/talents",
                 type: "GET",
             }).done(function (response) {
                 var array = response;
@@ -199,9 +208,9 @@
             //aws config update
             AWS.config.update({ //USE MX's token keys
                 region: bucketRegion,
-                accessKeyId: "ASIAXURB2YHHNOT2TCF7",
-                secretAccessKey: "eJfORnvHJMPmXC9csClJWnjVbjl0EoAZ1dpcuEMd",
-                sessionToken: "FwoGZXIvYXdzEFwaDO49JL33F+7fQwQBIyLKAc67mRqZBnxzBpEanHq7WlPXe5vIAk6C6ljJ1m9gfUqa8+hQccjgg1auI04Fu4gJ701xG862kxrm095JqFSLYTSN4bLT4XP6ZfelHoGLdqfFq9p/WIcK3bqVyjBN8bTJqlyoWpFB+Ksn690h7DXgCaG2vp7RrYYC5c4hXjqJnJlcV32PmOUu+8Ie5o7LhiPJ2UxNDzk1ya4jQigt6g36UVy8rwH9j9wfe7Jng1b2SxiJOgyEouKelJRAfnXf5XiGQOoTZAM0JoixhD4oydP5gAYyLcTDnItVWfaFwd50VlcNK5uYCrqy070aBiPtL77yKJVdGP9HGAjqzX4l7+W6xw=="
+                accessKeyId: "ASIAXURB2YHHDKDTPVF7",
+                secretAccessKey: "Lw415u9zVPp7DVSJE+SNY6s30qzKiPJhm6udlHc9",
+                sessionToken: "FwoGZXIvYXdzEGAaDCZusQyORBJUdsdZEyLKAcm2bt7+7I75EBw5Sr/HuqZ/PwdAr7vC5br2EnyKU9+J21p+HMazB/HH3Hte8ItGceNivDM7muF+Ee72bLZavXis3U4rWOglYyu9UZqN/Rg18fzUMOkNl9CzMOv0EATTyUEjS+8NVojSCU4U1OXTX34ddIBxFDg2Pb/A4ay2pjw1iAEMfV6fX12oYvFoGiUoCGiU80VE7kT5sEBGzmHeH915oipwFm0N5qU+pDBQfu19HuYI5ulTs0icPo6SHIr3rCdf+p3TC2LpeMAozdT6gAYyLT45dobgKEfXVda3L8c7zrQ0vCQ1xtG2ftVahgAN3RmFRgrc/bZo5E2WzwQnsA=="
             });
 
             var uploadS3 = new AWS.S3({
@@ -236,14 +245,15 @@
                                             fileName = fileName.replace(".PNG", "");
 
                                             var abc = {
-                                                name: fileName.replace(".jpg", ""),
-                                                bio: "Talents",
-                                                imageLongUrl: amazonLink
+                                                "name": fileName.replace(".jpg", ""),
+                                                "bio": "Talents",
+                                                "imageLongUrl": amazonLink
                                             }
+                                            abc = JSON.stringify(abc);
 
                                             //store talents in aws db
                                             $.ajax({
-                                                url: "talents/data",
+                                                url: "https://prlc23r7bg.execute-api.us-east-1.amazonaws.com/csc-ca2/talents",
                                                 type: "POST",
                                                 data: abc,
                                             }).done(function (response) {
