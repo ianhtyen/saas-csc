@@ -10,7 +10,7 @@ function createDbConnection(){
         //user: "csc_ca2_user",
         host: "csc-database.cidejfucv1xv.us-east-1.rds.amazonaws.com",
         user: "csc_ca2_user",
-        password: "csc-ca2!",
+        password: "csc_ca2!",
         port: 3306
     });
     return connection;
