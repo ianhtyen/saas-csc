@@ -47,17 +47,17 @@
          *  https://disqus.com/admin/universalcode/#configuration-variables
          */
 
-        var disqus_config = function () {
+        //var disqus_config = function () {
             // Replace PAGE_URL with your page's canonical URL variable
-            this.page.url = PAGE_URL;
-        };
+           // this.page.url = PAGE_URL;
+       // };
 
 
         (function () {  // REQUIRED CONFIGURATION VARIABLE: EDIT THE SHORTNAME BELOW
             var d = document, s = d.createElement('script');
 
             // IMPORTANT: Replace EXAMPLE with your forum shortname!
-            s.src = 'https://EXAMPLE.disqus.com/embed.js';
+            s.src = 'https://csc-ca2-3.disqus.com/embed.js';
 
             s.setAttribute('data-timestamp', +new Date());
             (d.head || d.body).appendChild(s);
@@ -89,21 +89,26 @@
             }
 
             var updateBody = {
-                name: name,
-                bio: bio,
+                "name": name,
+                "bio": bio,
             }
+            updateBody = JSON.stringify(updateBody);
 
             $.ajax({
-                url: `talents/data/${id}`,
+                url: `https://prlc23r7bg.execute-api.us-east-1.amazonaws.com/csc-ca2/talents/${id}`,
                 type: "PUT",
                 data: updateBody,
             }).done(function (response) {
                 displayTalents();
                 console.log(response);
-                alert("Affected rows:" + response.affectedRows)
+                if(response.affectedRows !== 0){
+                    alert("Affected rows:" + response.affectedRows);
+                } else {
+                    alert("Affected rows:" + response.affectedRows + "\nNo results found");
+                }
             }).fail(function(response){
                 console.log(response);
-                alert(response.statusText);
+                alert(response);
             })
             .catch(function (err) {
                 alert(err.responseJSON.sqlMessage);
@@ -120,18 +125,22 @@
                 return;
             }
             $.ajax({
-                url: `talents/data/${id}`,
+                url: `https://prlc23r7bg.execute-api.us-east-1.amazonaws.com/csc-ca2/talents/${id}`,
                 type: "DELETE",
             }).done(function (response) {
                 displayTalents();
                 console.log(response);
-                alert("Affected rows:" + response.affectedRows)
+                if(response.affectedRows !== 0){
+                    alert("Affected rows:" + response.affectedRows);
+                } else {
+                    alert("Affected rows:" + response.affectedRows + "\nNo results found");
+                }
             }).fail(function(response){
                 console.log(response);
                 alert(response.statusText);
             })
             .catch(function (err) {
-                alert(err.responseJSON.sqlMessage);
+                alert(err);
                 console.log(err);
             });
         });
@@ -139,7 +148,7 @@
         //get
         function displayTalents() {
             $.ajax({
-                url: "talents/data",
+                url: "https://prlc23r7bg.execute-api.us-east-1.amazonaws.com/csc-ca2/talents",
                 type: "GET",
             }).done(function (response) {
                 var array = response;
@@ -199,9 +208,15 @@
             //aws config update
             AWS.config.update({ //USE MX's token keys
                 region: bucketRegion,
+<<<<<<< HEAD
                 accessKeyId: "-",
                 secretAccessKey: "-",
                 sessionToken: "-"
+=======
+                accessKeyId: "ASIAXURB2YHHIJWGQBNH",
+                secretAccessKey: "X8dNw8V+FxVmew0liS9r1ERr4N9EP8apNv6qoYct",
+                sessionToken: "FwoGZXIvYXdzEGYaDMeycVMlEMQafJ1M6CLKAcRDG83Yhu7WsNqoLBZ9xRq0rUf1yiZOZ41FwNucyoYadYDBgxqKe9sBomzSamv39F+TYMXBIfNDDRWyON4OUsz1C+tamSz2hfiYLvyI/AB+AU7K7lrBXZALT7+n5FGdY0E2bKpT8TJv+v4QduihR4Tc92/IlrikCzDaRkc7Pcx2RaviEAT2fujep/eUZv8hfRnfwWhOqSFjLraH5sRhPp+imEEjgx+lKFpjOiEyq8K8NbYPJFBWpdOOVQCJcugOXL4OGOqKWBwDd+UosYL8gAYyLXSyjApCCwTlfJAK1thHnKhSWLGBLupolQjomeJ4XUN0eKsWH4BfeKxdCUI/nQ=="
+>>>>>>> 1ccb568d0626d6aa23fac9d215fa167173c4b322
             });
 
             var uploadS3 = new AWS.S3({
@@ -236,19 +251,24 @@
                                             fileName = fileName.replace(".PNG", "");
 
                                             var abc = {
-                                                name: fileName.replace(".jpg", ""),
-                                                bio: "Talents",
-                                                imageLongUrl: amazonLink
+                                                "name": fileName.replace(".jpg", ""),
+                                                "bio": "Talents",
+                                                "imageLongUrl": amazonLink
                                             }
+                                            abc = JSON.stringify(abc);
 
                                             //store talents in aws db
                                             $.ajax({
-                                                url: "talents/data",
+                                                url: "https://prlc23r7bg.execute-api.us-east-1.amazonaws.com/csc-ca2/talents",
                                                 type: "POST",
                                                 data: abc,
                                             }).done(function (response) {
                                                 displayTalents();
                                                 console.log(response);
+                                                alert(response);
+                                            }).fail(function(err){
+                                                console.log(response);
+                                                alert(response.statusText);
                                             });
                                         }
                                     });

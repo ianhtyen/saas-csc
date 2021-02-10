@@ -2,7 +2,7 @@
 <h1>Register</h1>
 <b><%- include ('./partials/messages') %></b>
 
-<form action="users/charge" method="post" id="stripeform">
+<form action="/users/charge" method="POST" id="stripeForm">
 
   <article>
       <label>Optional Subscription: $0.5</label>
@@ -54,10 +54,10 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js" type="text/javascript"></script>
 <script>
 
-          $("#stripeform").submit(function (event) {
+          $("#stripeForm").submit(function (event) {
             event.preventDefault(); //prevent default action 
-            var post_url = $(this).attr("action"); //get form action url
-            var request_method = $(this).attr("method"); //get form GET/POST method
+            var post_url = "users/charge"; //get form action url
+            var request_method = "POST"; //get form GET/POST method
             var form_data = $(this).serialize(); //Encode form elements for submission
             $.ajax({
                 url: post_url,

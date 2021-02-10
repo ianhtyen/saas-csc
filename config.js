@@ -1,7 +1,7 @@
 exports.awsConfig = {
     "region": "us-east-1",
     "endpoint": "http://dynamodb.us-east-1.amazonaws.com",
-    "accessKeyId": "ASIA6COLRGFUADW2UQNZ", 
-    "secretAccessKey": "rUXiBDs7bOxuMdQmxlJ+yR/kzECo8wm5gkh/Wg7e",
-    "sessionToken": "FwoGZXIvYXdzEF0aDJXUnf4Lt3gScv2KuiLLAfPV79/YXvqKTRokCgg09n0HsKfeOB/UOf7kllvWtHO4Xx6S50zzwtPosILqiMDxPJ+ud1cSeuCTFXQRaS11jdhKDJRcshrP+8vecn/Pc0WKXG6+tzm91XfQ9cALB9rHSKysdsDSqiYFoQVMhp1XNXLRnYpTlWTJbHGCiuqhL2BetU99G2XiTcDPePBbX1NjdO8tE6PfZxbmnoj8Bv8c9nTkxfUUA5B6oBTPV/xAaRPPTuIUwbo7JK9gRUdgYqjqC5Q2sAHNzCNsSYbgKK75+YAGMi1xkUTB+OItcNimiAs3SRShXRP1Mj+lmDqsC26NU4ETrfR5YJ9srkkybCXagd8="
+    "accessKeyId": "ASIA6COLRGFUBHOXX65K", 
+    "secretAccessKey": "18E+4p0hq/lP8Za/NsbNHdZJKVxZesM6KMYUfB5A",
+    "sessionToken": "FwoGZXIvYXdzEGQaDAulEwjFl9OsnHGo6iLLATjGv2F3d05iobliLkVNgwsIdafVxHig7xskxowtY7TiyFO5MCMWgk80whimt5eTSFwCwRuzfypGBl7X3Rfw2Th/T/3+q6Uy5MdT7WUBLj0MOKjdvIETCCxz8zQEAK/eopRgkMqtfnkGZgyFdkKr+d1vjzVDw8bzKuWiM2gTdYm0yMtQeFBQhkmk+lO6N0QHaI9lKdPv+b/ev2U+sqo17fWe2JghwkmQTgu6nEfJy0Xyzh4RcOYNm9VQyz0NBCrXwkQZkol1JDXz35sVKMXF+4AGMi3SbRzwVTncqGSaXK0al7FrvABJa5O/lQwx9tG/W7stqB16DROrwLW/q3UgsWU="
 };
