@@ -222,7 +222,7 @@
                 base64: baseImage
             }).then(
                 function () {
-                    app.models.predict({ id: 'human-recognition', version: "159f84aa23ef474b9fc1cdf8ac6f0f1c" }, { base64: baseImage }).then(
+                    app.models.predict({ id: 'human-recognition', version: "44bcd12b3eb044c69d307fc5f3f5bc26" }, { base64: baseImage }).then(
                         function (response) {
                             var concepts = response['outputs'][0]['data']['concepts']
                             var score = concepts[0].value.toFixed(20)
