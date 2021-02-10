@@ -21,7 +21,7 @@ router.get('/reset',(req,res)=>{
     var connection = createDbConnection();
     connection.connect();
 
-    connection.query('DROP DATABASE csc_ca2;');
+    connection.query('DROP DATABASE IF EXIST csc_ca2;');
 
     connection.query('CREATE DATABASE IF NOT EXISTS csc_ca2;',
     function (error, result, fields) {
