@@ -8,8 +8,8 @@ function createDbConnection(){
     var connection = mysql.createConnection({
         //host: "csc-ca2-db-instance.c1hallmmvxny.us-east-1.rds.amazonaws.com",
         //user: "csc_ca2_user",
-        host: "aa1l6mggzck13gf.c1hallmmvxny.us-east-1.rds.amazonaws.com",
-        user: "cscCa2User",
+        host: "csc-database.cidejfucv1xv.us-east-1.rds.amazonaws.com",
+        user: "csc_ca2_user",
         password: "csc-Ca2!",
         port: 3306
     });
