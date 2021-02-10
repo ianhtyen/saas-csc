@@ -1,6 +1,6 @@
 # CSC Cloud Computing Assignment 2
 
-Using node.js
+Using node.js. for-deployment branch for amazon deployment
 
 ## Installation
 
