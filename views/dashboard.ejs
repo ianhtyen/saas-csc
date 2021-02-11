@@ -208,11 +208,10 @@
             //aws config update
             AWS.config.update({ //USE MX's token keys
                 region: bucketRegion,
-                accessKeyId: "ASIAVGGZJGAYOJWDZWWM",
-                secretAccessKey: "XZQJ+NxOQHVXFAbeuHzWV/jjoRr12lGyXgmBTeSX",
-             sessionToken: "FwoGZXIvYXdzEML//////////wEaDIsv8SMFeTQTV37/EiLKAae0MqY1WHMuu9u/WemfuNVi/UZV1E7OQdMAy1ANEltXJRbPmn7ma7Uq2mkJZDIFoz4lzlVJKRZG5GlRMRYc7K57F0Ad6hPKMKfZU0j71ltTHzlYZ5A7PjlE+ual1K6Q65wK0/ALCmvW33IXqa/UIv1GlJ18ertOsMoKoIvPZcnLId8eFabQG5TqzRrIpUF9JbYSEP6c88dbaBvHiNT8nx/b9XSOoZFVykP9AH1aWuL1lsctSpFWOeRFamMR6h+EupEoVm/U6kBdrCUokIyQgQYyLXxlBxYBVQdUpfefOsP9jQ6C9LCZzZEVYz/LAa3AfbVy61ceXm9HYBdmgFSFSg=="
+                accessKeyId: "ASIAVGGZJGAYOIYKIRX4",
+                secretAccessKey: "GoCGLb0xlIiA4GGj2C7Fkna84B5aAbj4XY2aqYLI",
+             sessionToken: "FwoGZXIvYXdzEM3//////////wEaDNBNKV5Zze0/J/uPvyLKAb3l5pBOGf8yOP238i8g/clgVk6nzoK4mDKUvdZLeK9f8/QiLGCaU5tDlDDkoDepZ+RocjWfXQ4Oa4E2aL7nCE64FmARmYw+9Skgu5ucUnsrERF7Szv2NIXtWhl9Ys4GBrPqrxHml+S8WNuvldDqhNayp2Njc4COR19VB37WCfl1rJgEZMp2rJP+YyqpMFIaP7gxo+4mUKUzvo/2E6qeZaipf8t/2G3E8bDvZPqO4FeRL/caLqoy/0aLSPhfN6YyjJ7ZLwyca1CTfSgo1MmSgQYyLaJt6Vd1mi8oiXOclMCOLHSu3xtP9SqFn1/QSgY/EaQM84yzvUPV/vqWOiI8Ig=="
             });
-
             var uploadS3 = new AWS.S3({
                 params: { Bucket: albumBucketName }
             });
